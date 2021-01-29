@@ -1,0 +1,21 @@
+{
+	"name": "zipfilfrassi",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SSI http zip fil",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "covid19/overvagning/data/data-epidemiologisk-rapport-28012021-5mus_v2"
+			},
+			"compression": {
+				"type": "ZipDeflate"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
