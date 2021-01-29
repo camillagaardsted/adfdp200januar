@@ -7,7 +7,21 @@
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
-		"schema": [],
+		"schema": [
+			{
+				"name": "Land",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Stat",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Antal",
+				"type": "bigint",
+				"precision": 19
+			}
+		],
 		"typeProperties": {
 			"schema": "dbo",
 			"table": "Byer"
