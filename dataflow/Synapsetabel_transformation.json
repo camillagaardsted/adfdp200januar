@@ -1,0 +1,29 @@
+{
+	"name": "Synapsetabel_transformation",
+	"properties": {
+		"type": "WranglingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"name": "AzureSynapseAnalyticsTable1",
+					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~>  AzureSynapseAnalyticsTable1",
+					"dataset": {
+						"referenceName": "AzureSynapseAnalyticsTable1",
+						"type": "DatasetReference"
+					}
+				}
+			],
+			"sinks": [
+				{
+					"name": "Sink1",
+					"dataset": {
+						"referenceName": "AzureSqlTable1",
+						"type": "DatasetReference"
+					},
+					"script": "sink(input(\n\t\tLand as string,\n\t\tStat as string,\n\t\tAntal as long\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> Sink1"
+				}
+			],
+			"script": "section Section1;\r\nshared AzureSynapseAnalyticsTable1 = let\r\n  AdfDoc = Sql.Database(\"synapse20210129.sql.azuresynapse.net\", \"fredagspool\"),\r\n  InputTable = AdfDoc{[Schema = \"wwi\", Item = \"dimension_City\"]}[Data]\r\nin\r\n  InputTable;\r\nshared UserQuery = let\r\n  Source = AzureSynapseAnalyticsTable1,\r\n  #\"Removed other columns\" = Table.SelectColumns(Source, {\"City\", \"State Province\", \"Country\"})\r\nin\r\n  #\"Removed other columns\";\r\n"
+		}
+	}
+}
