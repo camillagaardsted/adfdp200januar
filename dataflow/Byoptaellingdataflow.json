@@ -27,9 +27,15 @@
 				},
 				{
 					"name": "Gruppering"
+				},
+				{
+					"name": "AlterRow1"
+				},
+				{
+					"name": "Filter1"
 				}
 			],
-			"script": "source(output(\n\t\t{City Key} as integer,\n\t\t{WWI City ID} as integer,\n\t\tCity as string,\n\t\t{State Province} as string,\n\t\tCountry as string,\n\t\tContinent as string,\n\t\t{Sales Territory} as string,\n\t\tRegion as string,\n\t\tSubregion as string,\n\t\tLocation as string,\n\t\t{Latest Recorded Population} as long,\n\t\t{Valid From} as timestamp,\n\t\t{Valid To} as timestamp,\n\t\t{Lineage Key} as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> bytabelfrasynapse\nbytabelfrasynapse select(mapColumn(\n\t\tBynavn = City,\n\t\tStat = {State Province},\n\t\tLand = Country,\n\t\tContinent,\n\t\t{Sales Territory},\n\t\tRegion,\n\t\tSubregion,\n\t\tLocation,\n\t\t{Latest Recorded Population},\n\t\t{Valid From},\n\t\t{Valid To},\n\t\t{Lineage Key}\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nSelect1 aggregate(groupBy(Land,\n\t\tStat),\n\tAntal = count(Bynavn)) ~> Gruppering\nGruppering sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> azuresqldatabase"
+			"script": "source(output(\n\t\t{City Key} as integer,\n\t\t{WWI City ID} as integer,\n\t\tCity as string,\n\t\t{State Province} as string,\n\t\tCountry as string,\n\t\tContinent as string,\n\t\t{Sales Territory} as string,\n\t\tRegion as string,\n\t\tSubregion as string,\n\t\tLocation as string,\n\t\t{Latest Recorded Population} as long,\n\t\t{Valid From} as timestamp,\n\t\t{Valid To} as timestamp,\n\t\t{Lineage Key} as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> bytabelfrasynapse\nbytabelfrasynapse select(mapColumn(\n\t\tBynavn = City,\n\t\tStat = {State Province},\n\t\tLand = Country,\n\t\tContinent,\n\t\t{Sales Territory},\n\t\tRegion,\n\t\tSubregion,\n\t\tLocation,\n\t\t{Latest Recorded Population},\n\t\t{Valid From},\n\t\t{Valid To},\n\t\t{Lineage Key}\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nSelect1 aggregate(groupBy(Land,\n\t\tStat),\n\tAntal = count(Bynavn)) ~> Gruppering\nFilter1 alterRow(deleteIf(true()),\n\tupsertIf(true())) ~> AlterRow1\nGruppering filter(Land!='N/A') ~> Filter1\nAlterRow1 sink(input(\n\t\tLand as string,\n\t\tStat as string,\n\t\tAntal as long\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:true,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['Land','Stat'],\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> azuresqldatabase"
 		}
 	}
 }
